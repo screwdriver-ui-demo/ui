@@ -7,19 +7,72 @@ import sinonTest from 'ember-sinon-qunit/test-support/test';
 const templateServiceStub = Service.extend({
   getOneTemplate() {
     return resolve([
-      { id: 4, name: 'baz', version: '3.0.0', namespace: 'foo' },
+      { id: 4, name: 'baz', version: '10.0.0', namespace: 'foo' },
       { id: 3, name: 'baz', version: '2.0.0', namespace: 'foo' },
       { id: 2, name: 'baz', version: '1.1.0', namespace: 'foo' },
       { id: 1, name: 'baz', version: '1.0.0', namespace: 'foo' },
-      { id: 7, name: 'baz', version: '3.0.0', namespace: 'bar' },
+      { id: 7, name: 'baz', version: '10.0.0', namespace: 'bar' },
       { id: 6, name: 'baz', version: '2.0.0', namespace: 'bar' },
       { id: 5, name: 'baz', version: '1.0.0', namespace: 'bar' }
     ]);
   },
+  getOneTemplateWithMetrics() {
+    return resolve([
+      {
+        id: 4,
+        name: 'baz',
+        version: '10.0.0',
+        namespace: 'foo',
+        metrics: { jobs: { count: 1 }, builds: { count: 3 } }
+      },
+      {
+        id: 3,
+        name: 'baz',
+        version: '2.0.0',
+        namespace: 'foo',
+        metrics: { jobs: { count: 0 }, builds: { count: 0 } }
+      },
+      {
+        id: 2,
+        name: 'baz',
+        version: '1.1.0',
+        namespace: 'foo',
+        metrics: { jobs: { count: 7 }, builds: { count: 9 } }
+      },
+      {
+        id: 1,
+        name: 'baz',
+        version: '1.0.0',
+        namespace: 'foo',
+        metrics: { jobs: { count: 0 }, builds: { count: 0 } }
+      },
+      {
+        id: 7,
+        name: 'baz',
+        version: '10.0.0',
+        namespace: 'bar',
+        metrics: { jobs: { count: 7 }, builds: { count: 7 } }
+      },
+      {
+        id: 6,
+        name: 'baz',
+        version: '2.0.0',
+        namespace: 'bar',
+        metrics: { jobs: { count: 0 }, builds: { count: 0 } }
+      },
+      {
+        id: 5,
+        name: 'baz',
+        version: '1.0.0',
+        namespace: 'bar',
+        metrics: { jobs: { count: 1 }, builds: { count: 3 } }
+      }
+    ]);
+  },
   getTemplateTags(namespace, name) {
     return resolve([
-      { id: 5, name, version: '3.0.0', tag: 'latest' },
-      { id: 6, name, version: '3.0.0', tag: 'stable' },
+      { id: 5, name, version: '10.0.0', tag: 'latest' },
+      { id: 6, name, version: '10.0.0', tag: 'stable' },
       { id: 7, name, version: '2.0.0', tag: 'meeseeks' }
     ]);
   }
@@ -51,6 +104,8 @@ module('Unit | Route | templates/detail', function(hooks) {
       assert.equal(templates.templateData[0].namespace, 'foo');
       assert.equal(templates.templateData[0].name, 'baz');
       assert.equal(templates.versionOrTagFromUrl, undefined);
+      assert.equal(templates.templateData[0].metrics.jobs.count, 1);
+      assert.equal(templates.templateData[0].metrics.builds.count, 3);
     });
   });
 
@@ -72,6 +127,8 @@ module('Unit | Route | templates/detail', function(hooks) {
       assert.equal(templates.templateData[0].namespace, 'foo');
       assert.equal(templates.templateData[0].name, 'baz');
       assert.equal(templates.versionOrTagFromUrl, '1.0.0');
+      assert.equal(templates.templateData[3].metrics.jobs.count, 0);
+      assert.equal(templates.templateData[3].metrics.builds.count, 0);
     });
   });
 
@@ -85,6 +142,8 @@ module('Unit | Route | templates/detail', function(hooks) {
       assert.equal(templates.templateData[0].namespace, 'foo');
       assert.equal(templates.templateData[0].name, 'baz');
       assert.equal(templates.versionOrTagFromUrl, '1.1.0');
+      assert.equal(templates.templateData[2].metrics.jobs.count, 7);
+      assert.equal(templates.templateData[2].metrics.builds.count, 9);
     });
   });
 
@@ -106,6 +165,8 @@ module('Unit | Route | templates/detail', function(hooks) {
       assert.equal(templates.templateData[0].namespace, 'foo');
       assert.equal(templates.templateData[0].name, 'baz');
       assert.equal(templates.versionOrTagFromUrl, 'stable');
+      assert.equal(templates.templateData[3].metrics.jobs.count, 0);
+      assert.equal(templates.templateData[3].metrics.builds.count, 0);
     });
   });
 

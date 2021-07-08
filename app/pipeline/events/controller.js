@@ -239,13 +239,11 @@ export default Controller.extend(ModelReloaderMixin, {
     updateEvents(page) {
       this.updateEvents(page);
     },
-
     onEventListScroll({ currentTarget }) {
       if (this.moreToShow && !this.isFetching) {
         this.checkForMorePage(currentTarget);
       }
     },
-
     startMainBuild(parameters) {
       this.set('isShowingModal', true);
 
@@ -357,6 +355,13 @@ export default Controller.extend(ModelReloaderMixin, {
     stopEvent() {
       const event = get(this, 'selectedEventObj');
       const eventId = get(event, 'id');
+
+      return this.get('stop')
+        .stopBuilds(eventId)
+        .catch(e => this.set('errorMessage', Array.isArray(e.errors) ? e.errors[0].detail : ''));
+    },
+    stopPRBuilds(jobs) {
+      const eventId = jobs.get('firstObject.builds.firstObject.eventId');
 
       return this.get('stop')
         .stopBuilds(eventId)
